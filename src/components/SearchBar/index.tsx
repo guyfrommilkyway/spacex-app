@@ -16,6 +16,7 @@ const SearchBar: React.FC<Props> = props => {
         onChange={e => onSearch(e?.target?.value)}
         borderRadius='0'
         borderColor='RGBA(0, 0, 0, 0.16)'
+        background='white'
       />
     </Box>
   );
