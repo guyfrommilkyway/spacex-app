@@ -1,3 +1,10 @@
+# Usage
+- Clone repository: `git clone https://github.com/guyfrommilkyway/spacex-app.git`
+- Go into project directory: `cd ./spacex-app`
+- Install packages: `npm i`
+- Run the applicaton: `npm run dev`
+- To view the application, visit `localhost:5173` on your browser
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
