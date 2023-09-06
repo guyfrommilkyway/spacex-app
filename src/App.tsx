@@ -5,10 +5,10 @@ import { Box } from '@chakra-ui/react';
 // import components below
 import SearchBar from '@/components/SearchBar';
 import Launches from '@/components/Launches';
-const LoadingScreen = React.lazy(() => import('@/components/LoadingScreen'));
-const NoDataAvailable = React.lazy(() => import('@/components/NoDataAvailable'));
-const InfiniteLoader = React.lazy(() => import('@/components/InfiniteLoader'));
-const EndMessage = React.lazy(() => import('@/components/EndMessage'));
+import LoadingScreen from '@/components/LoadingScreen';
+import NoDataAvailable from '@/components/NoDataAvailable';
+import InfiniteLoader from '@/components/InfiniteLoader';
+import EndMessage from '@/components/EndMessage';
 
 // import utils below
 import useGetLaunches from '@/hooks/useGetLaunches';
