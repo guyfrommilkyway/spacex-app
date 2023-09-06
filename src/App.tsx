@@ -1,50 +1,53 @@
 // import packages below
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, ReactNode } from 'react';
 import { Box } from '@chakra-ui/react';
 
 // import components below
 import SearchBar from '@/components/SearchBar';
 import Launches from '@/components/Launches';
-const LoadingScreen = React.lazy(() => import('@/components/LoadingScreen'));
 const NoDataAvailable = React.lazy(() => import('@/components/NoDataAvailable'));
+const InfiniteLoader = React.lazy(() => import('@/components/InfiniteLoader'));
+const EndMessage = React.lazy(() => import('@/components/EndMessage'));
 
 // import utils below
 import useGetLaunches from '@/hooks/useGetLaunches';
 import useSearch from '@/hooks/useSearch';
 
-const App: React.FC = () => {
+interface Props {
+  renderLoading: ReactNode;
+}
+
+const App: React.FC<Props> = props => {
+  const { renderLoading } = props;
+
+  // state
   const { launches, launchesHandler } = useGetLaunches();
   const { result, searchHandler, resetHandler } = useSearch();
   const [keyword, setKeyword] = useState<string>();
+  const [count, setCount] = useState<number>(10);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSetting, setIsSetting] = useState<boolean>(false);
+  const [isEnd, setIsEnd] = useState<boolean>(false);
 
-  // final data
-  const availableData = keyword ? result : launches;
+  // data
+  const data = keyword ? result : launches;
 
-  console.log(availableData);
-
-  // scroll handler
-  const scrollHandler = useCallback(() => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
-      console.log('bottom reached');
-    }
-  }, []);
-
-  // will run only once
+  // fetch launches on initial page visit
   useEffect(() => {
     launchesHandler(setIsLoading);
   }, []);
 
-  // search
+  // search listener
   useEffect(() => {
     let timeout: any;
 
     if (keyword) {
       setIsLoading(true);
+
       timeout = setTimeout(() => {
         searchHandler(launches, keyword);
         setIsLoading(false);
-      }, 1500);
+      }, 500);
     } else {
       resetHandler();
       setIsLoading(false);
@@ -54,21 +57,56 @@ const App: React.FC = () => {
     return () => clearTimeout(timeout);
   }, [launches, keyword]);
 
+  // scroll handler
+  const scrollHandler = useCallback(() => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+      if (count < data.length) {
+        setIsSetting(true);
+        document.body.style.overflow = 'hidden';
+
+        setTimeout(() => {
+          setIsSetting(false);
+          setCount(prev => prev + 10);
+          document.body.removeAttribute('style');
+        }, 500);
+      } else {
+        setIsEnd(true);
+      }
+    }
+  }, [count, data]);
+
+  // scroll listener
   useEffect(() => {
     window.addEventListener('scroll', scrollHandler);
 
     // clean up
     return () => window.removeEventListener('scroll', scrollHandler);
-  }, []);
+  }, [count, data]);
+
+  // variables
+  const showLoader = isLoading;
+  const showLaunches = !isLoading && data.length > 0;
+  const showNoDataAvailable = !isLoading && keyword && data.length === 0;
+  const showInfiniteLoader = isSetting;
+  const showEndMessage = isEnd;
 
   return (
-    <Box w='100%' h='100%' minH='100vh' px={{ base: 4, md: 8, xl: 16 }} py={{ base: 2, md: 4, xl: 8 }}>
+    <Box
+      w='100%'
+      h='100%'
+      minH='100vh'
+      px={{ base: 4, md: 8, xl: 16 }}
+      py={{ base: 2, md: 4, xl: 8 }}
+      overflow='hidden'
+    >
       <Box w='100%' h='100%' mx='auto' py={8} bg='blackAlpha.100'>
         <Box w='100%' maxW='920px' mx='auto'>
           <SearchBar onSearch={(key: string) => setKeyword(key)} />
-          {isLoading && <LoadingScreen />}
-          {!isLoading && availableData.length > 0 && <Launches data={availableData} />}
-          {!isLoading && keyword && availableData.length === 0 && <NoDataAvailable />}
+          {showLoader && renderLoading}
+          {showLaunches && <Launches data={data.slice(0, count)} />}
+          {showNoDataAvailable && <NoDataAvailable />}
+          {showInfiniteLoader && <InfiniteLoader />}
+          {showEndMessage && <EndMessage />}
         </Box>
       </Box>
     </Box>
