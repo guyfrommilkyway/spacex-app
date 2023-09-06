@@ -8,7 +8,7 @@ import App from './App.tsx';
 const SplashScreen = React.lazy(() => {
   return Promise.all([
     import('@/components/SplashScreen/index.tsx'),
-    new Promise(resolve => setTimeout(resolve, 500)),
+    new Promise(resolve => setTimeout(resolve, 1500)),
   ]).then(([moduleExports]) => moduleExports);
 });
 
