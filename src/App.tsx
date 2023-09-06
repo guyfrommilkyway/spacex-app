@@ -1,10 +1,11 @@
 // import packages below
-import React, { useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Box } from '@chakra-ui/react';
 
 // import components below
 import SearchBar from '@/components/SearchBar';
 import Launches from '@/components/Launches';
+const LoadingScreen = React.lazy(() => import('@/components/LoadingScreen'));
 const NoDataAvailable = React.lazy(() => import('@/components/NoDataAvailable'));
 const InfiniteLoader = React.lazy(() => import('@/components/InfiniteLoader'));
 const EndMessage = React.lazy(() => import('@/components/EndMessage'));
@@ -13,13 +14,7 @@ const EndMessage = React.lazy(() => import('@/components/EndMessage'));
 import useGetLaunches from '@/hooks/useGetLaunches';
 import useSearch from '@/hooks/useSearch';
 
-interface Props {
-  renderLoading: ReactNode;
-}
-
-const App: React.FC<Props> = props => {
-  const { renderLoading } = props;
-
+const App: React.FC = () => {
   // state
   const { launches, launchesHandler } = useGetLaunches();
   const { result, searchHandler, resetHandler } = useSearch();
@@ -102,7 +97,7 @@ const App: React.FC<Props> = props => {
       <Box w='100%' h='100%' mx='auto' py={8} bg='blackAlpha.100'>
         <Box w='100%' maxW='920px' mx='auto'>
           <SearchBar onSearch={(key: string) => setKeyword(key)} />
-          {showLoader && renderLoading}
+          {showLoader && <LoadingScreen />}
           {showLaunches && <Launches data={data.slice(0, count)} />}
           {showNoDataAvailable && <NoDataAvailable />}
           {showInfiniteLoader && <InfiniteLoader />}
