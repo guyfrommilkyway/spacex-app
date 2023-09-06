@@ -42,10 +42,12 @@ const App: React.FC = () => {
       timeout = setTimeout(() => {
         searchHandler(launches, keyword);
         setIsLoading(false);
+        setIsSetting(false);
       }, 500);
     } else {
       resetHandler();
       setIsLoading(false);
+      setIsSetting(false);
     }
 
     // clean up
@@ -78,7 +80,7 @@ const App: React.FC = () => {
     return () => window.removeEventListener('scroll', scrollHandler);
   }, [count, data]);
 
-  // variables
+  // conditional variables
   const showLoader = isLoading;
   const showLaunches = !isLoading && data.length > 0;
   const showNoDataAvailable = !isLoading && keyword && data.length === 0;
